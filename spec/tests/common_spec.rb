@@ -3,11 +3,14 @@ require 'spec_helper'
 ###
 
 class CcA
+  include ClassCallbacks
+
   attr_reader :var1
   attr_reader :var2
 
   define_callback :before
   define_callback :after
+  define_callback :vars
 end
 
 class CcB < CcA
@@ -31,6 +34,8 @@ class CcD < CcC
 end
 
 module CcE
+  include ClassCallbacks
+
   extend self
 
   @num = [1]
@@ -46,8 +51,14 @@ module CcE
     @num.push 3
   end
 
-  after do
+  after :push_4, :push_5
+
+  def push_4
     @num.push 4
+  end
+
+  def push_5
+    @num.push 5
   end
 
   def num
@@ -81,7 +92,7 @@ describe 'Class callbacks' do
       CcE.run_callback :before
       expect(CcE.num).to eq [1, 2, 3]
       CcE.run_callback :after
-      expect(CcE.num).to eq [1, 2, 3, 4]
+      expect(CcE.num).to eq [1, 2, 3, 4, 5]
     end
 
     it 'can pass parameters' do

@@ -1,6 +1,6 @@
 # class-callbacks
 
-Class callbacks allow creation of ruby class methods that can capture blocks and params, considering class ancestors.
+Class callbacks allow creation of ruby class methods that can capture and execute blocks, considering class ancestors.
 
 ## Installation
 
@@ -19,6 +19,41 @@ and to use
 ## How to use
 
 Common usage is to use it to define before and after filters in non-rails environments.
+
+```ruby
+require 'class-callbacks'
+
+class ComeClass
+  include ClassCallbacks
+
+  define_callback :before
+end
+
+class SomeOtherClass < ComeClass
+  before do
+    @var = [:foo]
+  end
+end
+
+class EvenOtherClass < SomeOtherClass
+  before :add_more, :add_even_more
+
+  def test
+    run_callback :before # @var = [:foo, :bar, :baz]
+  end
+
+  private
+
+  def add_more
+    @var.push :bar
+  end
+
+  def add_even_more
+    @var.push :baz
+  end
+end
+
+```
 
 
 ## Dependency
